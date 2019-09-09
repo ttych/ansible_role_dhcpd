@@ -1,0 +1,19 @@
+#!/bin/sh
+
+SCRIPT_PATH=$(cd "${1%/*}"; pwd)
+
+DHCPD_DIR="{{ dhcpd_dir }}"
+DHCPD_CONF="{{ dhcpd_conf }}"
+DHCPD_LEASE="$DHCPD_DIR/var/lease.db"
+DHCPD_PID="$SCRIPT_PATH/dhcpd.pid"
+INTERFACES="{{ ansible_default_ipv4.interface }}"
+
+exec dhcpd \
+     -q \
+     -f \
+     -cf "$DHCPD_CONF" \
+     -lf "$DHCPD_LEASE" \
+     -pf "$DHCPD_PID" \
+     -user "{{ dhcpd_user }}" \
+     $INTERFACES \
+     2>&1

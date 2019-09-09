@@ -1,0 +1,17 @@
+---
+
+dhcpd_packages:
+  server:
+    - isc-dhcp-server
+  relay:
+    - isc-dhcp-relay
+  extra:
+    - dhcp-probe
+
+dhcpd_default_service:
+  server: isc-dhcp-server
+  server_6: isc-dhcp-server6
+  relay: isc-dhcp-relay
+  relay_6: isc-dhcp-relay6
+
+dhcpd_default_dir: /etc/dhcp

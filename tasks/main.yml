@@ -1,0 +1,18 @@
+---
+
+- name: dhcpd
+  block:
+    - name: set dhcpd context
+      include_tasks: context.yml
+
+    - name: install dhcpd distribution
+      include_tasks: install.yml
+
+    - name: configure dhcpd service
+      include_tasks: configure.yml
+
+  when: want_dhcpd
+
+- name: set has_dhcpd
+  set_fact:
+    has_dhcpd: "{{ want_dhcpd }}"

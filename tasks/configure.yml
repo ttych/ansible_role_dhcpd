@@ -1,0 +1,86 @@
+---
+- name: use dhcpd default service
+  block:
+
+    - name: use dhcpd defaults
+      set_fact:
+        dhcpd_service: "{{ dhcpd_default_service[dhcpd_mode] }}"
+        dhcpd_dir: "{{ dhcpd_default_dir }}"
+
+    - name: create dhcpd directory
+      include_tasks: dhcpd_dir.yml
+
+    - name: create configuration
+      include_tasks: dhcpd_conf.yml
+
+    - name: enable dhcpd service
+      service:
+        name: "{{ dhcpd_service }}"
+        enabled: yes
+        state: started
+
+  when: has_daemontools is not defined or not has_daemontools
+
+- name: use dhcpd daemontools service
+  block:
+
+    - name: set dhcpd user
+      set_fact:
+        dhcpd_user: 'dhcpd'
+
+    - name: set dhcpd dir
+      set_fact:
+        dhcpd_dir: "{{ dhcpd_dir | default(dhcpd_default_dir) }}"
+
+    - name: create dhcpd directory
+      include_tasks: dhcpd_dir.yml
+
+    - name: create configuration
+      include_tasks: dhcpd_conf.yml
+
+    - name: create daemontools service
+      block:
+
+        - name: daemontools directories
+          file:
+            path: "{{ item }}"
+            state: directory
+            owner: root
+            group: root
+            mode: '0755'
+          with_items:
+            - "{{ daemontools_service_dir }}/dhcpd"
+            - "{{ daemontools_service_dir }}/dhcpd/log"
+
+        - name: daemontools log main
+          file:
+            path: "{{ item }}"
+            state: directory
+            owner: "{{ dhcpd_user }}"
+            group: root
+            mode: '0755'
+          with_items:
+            - "{{ daemontools_service_dir }}/dhcpd/log/main"
+
+        - name: create lease file
+          copy:
+            content: ""
+            dest: "{{ dhcpd_dir }}/var/lease.db"
+            force: no
+            owner: "{{ dhcpd_user }}"
+            mode: 0600
+
+        - name: daemontools run scripts
+          template:
+            src: "{{ item.src }}"
+            dest: "{{ item.dest }}"
+            owner: root
+            group: root
+            mode: '0755'
+          with_items:
+            - { src: daemontools/run,
+                dest: "{{ daemontools_service_dir }}/dhcpd/run" }
+            - { src: daemontools/log_run,
+                dest: "{{ daemontools_service_dir }}/dhcpd/log/run" }
+
+  when: has_daemontools is defined and has_daemontools

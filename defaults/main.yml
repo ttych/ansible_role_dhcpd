@@ -1,0 +1,7 @@
+---
+want_dhcpd: true
+
+dhcpd_mode: "{{ hosttype | default('server') }}"
+
+dhcpd_default_lease_time: 43200
+dhcpd_max_lease_time: 86400

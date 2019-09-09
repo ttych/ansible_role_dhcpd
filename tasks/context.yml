@@ -1,0 +1,17 @@
+---
+- name: Include distribution specific variables
+  include_vars:
+    file: "{{ item }}"
+    name: _context
+  with_first_found:
+    - "{{ ansible_distribution_release }}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "default.yml"
+
+- name: Set fact from host specific vars or distribution context
+  set_fact: {
+    "{{ item.key }}":
+      "{{ hostvars[inventory_hostname][item.key] | default(item.value) }}"
+  }
+  with_dict: "{{ _context }}"
