@@ -1,0 +1,39 @@
+---
+
+dhcpd_packages:
+  server:
+    - isc-dhcp44-server
+  relay:
+    - isc-dhcp44-relay
+  extra:
+    - dhcp_probe
+    - dhcpdump
+
+dhcpd_services:
+  server:
+    - isc-dhcpd
+  server_6:
+    - isc-dhcpd6
+  relay:
+    - isc-dhcrelay
+  relay_6:
+    - isc-dhcrelay6
+
+dhcpd_services_sysrcs:
+  server:
+    - dhcpd
+  server_6:
+    - dhcpd6
+  relay:
+    - dhcrelay
+  relay_6:
+    - dhcrelay6
+
+
+# dhcrelay_enable=${dhcrelay_enable:-"NO"}
+# dhcrelay6_enable=${dhcrelay6_enable:-"NO"}
+# dhcrelay_flags=""                     # command option(s)
+# dhcrelay_servers=""                   # v4 dhcrelay server(s)
+# dhcrelay_ifaces=""                    # v4 ethernet interface(s)
+# dhcrelay6_lowers=""                   # v6 "lower" network interface(s)
+# dhcrelay6_uppers=""                   # v6 "upper" network interface(s)

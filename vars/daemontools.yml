@@ -1,0 +1,26 @@
+---
+
+dhcpd_service_dir: "{{ services_dir }}/dhcpd"
+dhcpd_etc_dir: "{{ dhcpd_service_dir }}/etc"
+dhcpd_conf_file: "{{ dhcpd_etc_dir }}/dhcpd.conf"
+dhcpd_log_dir: "{{ dhcpd_service_dir }}/log"
+dhcpd_log_file: "{{ dhcpd_log_dir }}/dhcpd.log"
+dhcpd_db_dir: "{{ dhcpd_service_dir }}/db"
+dhcpd_lease_file: "{{ dhcpd_db_dir }}/lease.db"
+dhcpd_run_dir: "{{ dhcpd_service_dir }}/run"
+dhcpd_pid_file: "{{ dhcpd_run_dir }}/dhcpd.pid"
+dhcpd_svscan_dir: "{{ dhcpd_service_dir }}/svscan"
+dhcpd_svscan_log_dir: "{{ dhcpd_svscan_dir }}/log"
+dhcpd_dir: "{{ dhcpd_service_dir }}"
+
+dhcpd_directories:
+  - { path: "{{ dhcpd_service_dir }}", owner: root, group: "{{ root_group }}", mode: "0755" }
+  - { path: "{{ dhcpd_etc_dir }}", owner: root, group: "{{ root_group }}", mode: "0755" }
+  - { path: "{{ dhcpd_log_dir }}", owner: "{{ dhcpd_user }}", group: "{{ root_group }}", mode: "0755" }
+  - { path: "{{ dhcpd_run_dir }}", owner: root, group: "{{ root_group }}", mode: "0755" }
+  - { path: "{{ dhcpd_db_dir }}", owner: "{{ dhcpd_user }}", group: "{{ root_group }}", mode: "0755" }
+  - { path: "{{ dhcpd_svscan_dir }}", owner: root, group: "{{ root_group }}", mode: "0755" }
+  - { path: "{{ dhcpd_svscan_log_dir }}", owner: root, group: "{{ root_group }}", mode: "0755" }
+  - { path: "{{ dhcpd_svscan_log_dir }}/main", owner: "{{ dhcpd_user }}", group: "{{ root_group }}", mode: "0755" }
+
+newsyslog_conf_dir: "{{ services_newsyslog_dir }}"

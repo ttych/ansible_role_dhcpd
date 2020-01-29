@@ -1,7 +1,32 @@
 ---
-want_dhcpd: true
+want_dhcpd: false
 
-dhcpd_mode: "{{ hosttype | default('server') }}"
+dhcpd_mode: server
 
 dhcpd_default_lease_time: 43200
 dhcpd_max_lease_time: 86400
+
+dhcpd_packages:
+  server: []
+  relay: []
+  extra: []
+
+dhcpd_services:
+  server: []
+  server_6: []
+  relay: []
+  relay_6: []
+
+dhcpd_user: dhcpd
+
+dhcpd_dir: /etc/dhcp
+dhcpd_conf_file: "{{ dhcpd_dir }}/dhcpd.conf"
+dhcpd_lease_file: "/var/db/lease.db"
+dhcpd_pid_file: "/var/run/dhcpd.pid"
+
+has_daemontools: false
+services_dir: /services
+daemontools_dir: "{{ services_dir }}/svscan"
+daemontools_svscan_dir: "{{ daemontools_dir }}/supervised"
+
+root_group: root

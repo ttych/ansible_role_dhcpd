@@ -35,7 +35,23 @@
 
 - name: disable default service
   service:
-    name: '{{ dhcpd_default_service[dhcpd_mode] }}'
-    enabled: no
+    name: "{{ item }}"
     state: stopped
-  when: install is defined and install.changed
+  loop: "{{ dhcpd_services[dhcpd_mode] }}"
+  when: install|d() and install.changed
+
+- name: disable default service
+  service:
+    name: "{{ item }}"
+    enabled: no
+  loop: "{{ dhcpd_services[dhcpd_mode] }}"
+  when:
+    - ansible_system == 'Linux'
+    - install|d() and install.changed
+
+- name: disable FreeBSD service
+  include: sysrc.yml key="{{ item }}_enable" value="NO"
+  loop: "{{ dhcpd_services_sysrcs[dhcpd_mode] }}"
+  when:
+    - ansible_system == 'FreeBSD'
+    - install|d() and install.changed

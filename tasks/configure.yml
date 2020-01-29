@@ -1,86 +1,97 @@
 ---
-- name: use dhcpd default service
+- name: inherit interfaces
+  set_fact:
+    dhcpd_interface: "{{ lan_if }}"
+  when: lan_if is defined
+
+- name: use default interface
+  set_fact:
+    dhcpd_interface: "{{ ansible_default_ipv4.interface }}"
+  when: dhcpd_interface is not defined
+
+
+- name: setup daemontools for dhcpd
   block:
+    - name: set service directory tree
+      file:
+        path: "{{ item.path }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+        state: directory
+      loop: "{{ dhcpd_directories }}"
 
-    - name: use dhcpd defaults
-      set_fact:
-        dhcpd_service: "{{ dhcpd_default_service[dhcpd_mode] }}"
-        dhcpd_dir: "{{ dhcpd_default_dir }}"
+    - template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root
+        group: "{{ root_group }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { src: svscan/run, dest: "{{ dhcpd_svscan_dir }}/run", mode: "0750" }
+        - { src: svscan/log/run, dest: "{{ dhcpd_svscan_log_dir }}/run", mode: "0750" }
 
-    - name: create dhcpd directory
-      include_tasks: dhcpd_dir.yml
+    - name: create lease file
+      copy:
+        content: ""
+        dest: "{{ dhcpd_lease_file }}"
+        force: no
+        owner: "{{ dhcpd_user }}"
+        mode: 0600
 
-    - name: create configuration
-      include_tasks: dhcpd_conf.yml
+    - name: link svscan
+      file:
+        src: "{{ dhcpd_svscan_dir }}"
+        dest: "{{ daemontools_svscan_dir }}/dhcpd"
+        state: link
 
-    - name: enable dhcpd service
+  when: has_daemontools
+
+
+- name: deploy dhcpd.conf
+  template:
+    src: dhcpd.conf
+    dest: "{{ dhcpd_conf_file }}"
+    owner: root
+    group: "{{ root_group }}"
+    mode: '0640'
+  register: t_dhcpd_conf
+
+
+- name: setup FreeBSD newsyslog
+  template:
+    src: newsyslog.conf.d/dhcpd.conf
+    dest: "{{ newsyslog_conf_dir }}/dhcpd.conf"
+    owner: root
+    group: "{{ root_group }}"
+    mode: '0644'
+  when: ansible_system == 'FreeBSD'
+
+
+- name: start standard service
+  block:
+    - name: enable standard FreeBSD service
+      include: sysrc.yml key="{{ item }}_enable" value="YES"
+      loop: "{{ dhcpd_services_sysrcs[dhcpd_mode] }}"
+      when: ansible_system == 'FreeBSD'
+
+    - name: enable standard Linux service
       service:
-        name: "{{ dhcpd_service }}"
-        enabled: yes
+        name: "{{ item }}"
+        enabled: true
+      loop: "{{ dhcpd_services[dhcpd_mode] }}"
+      when: ansible_system == 'Linux'
+
+    - service:
+        name: "{{ item }}"
         state: started
+      loop: "{{ dhcpd_services[dhcpd_mode] }}"
+      register: t_dhcpd_service
+
+    - service:
+        name: "{{ item }}"
+        state: restarted
+      loop: "{{ dhcpd_services[dhcpd_mode] }}"
+      when: t_dhcpd_conf.changed and not t_dhcpd_service.changed
 
   when: has_daemontools is not defined or not has_daemontools
-
-- name: use dhcpd daemontools service
-  block:
-
-    - name: set dhcpd user
-      set_fact:
-        dhcpd_user: 'dhcpd'
-
-    - name: set dhcpd dir
-      set_fact:
-        dhcpd_dir: "{{ dhcpd_dir | default(dhcpd_default_dir) }}"
-
-    - name: create dhcpd directory
-      include_tasks: dhcpd_dir.yml
-
-    - name: create configuration
-      include_tasks: dhcpd_conf.yml
-
-    - name: create daemontools service
-      block:
-
-        - name: daemontools directories
-          file:
-            path: "{{ item }}"
-            state: directory
-            owner: root
-            group: root
-            mode: '0755'
-          with_items:
-            - "{{ daemontools_service_dir }}/dhcpd"
-            - "{{ daemontools_service_dir }}/dhcpd/log"
-
-        - name: daemontools log main
-          file:
-            path: "{{ item }}"
-            state: directory
-            owner: "{{ dhcpd_user }}"
-            group: root
-            mode: '0755'
-          with_items:
-            - "{{ daemontools_service_dir }}/dhcpd/log/main"
-
-        - name: create lease file
-          copy:
-            content: ""
-            dest: "{{ dhcpd_dir }}/var/lease.db"
-            force: no
-            owner: "{{ dhcpd_user }}"
-            mode: 0600
-
-        - name: daemontools run scripts
-          template:
-            src: "{{ item.src }}"
-            dest: "{{ item.dest }}"
-            owner: root
-            group: root
-            mode: '0755'
-          with_items:
-            - { src: daemontools/run,
-                dest: "{{ daemontools_service_dir }}/dhcpd/run" }
-            - { src: daemontools/log_run,
-                dest: "{{ daemontools_service_dir }}/dhcpd/log/run" }
-
-  when: has_daemontools is defined and has_daemontools

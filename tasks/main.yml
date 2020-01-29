@@ -1,15 +1,11 @@
 ---
 
-- name: dhcpd
-  block:
-    - name: set dhcpd context
-      include_tasks: context.yml
+- block:
+    - include_tasks: context.yml
 
-    - name: install dhcpd distribution
-      include_tasks: install.yml
+    - include_tasks: install.yml
 
-    - name: configure dhcpd service
-      include_tasks: configure.yml
+    - include_tasks: configure.yml
 
   when: want_dhcpd
 
