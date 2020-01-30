@@ -1,10 +1,9 @@
 #!/bin/sh
 
-SCRIPT_PATH=$(cd "${1%/*}"; pwd)
-
 DHCPD_CONF="{{ dhcpd_conf_file }}"
 DHCPD_LEASE="{{ dhcpd_lease_file }}"
 DHCPD_PID="{{ dhcpd_pid_file }}"
+DHCPD_USER="{{ dhcpd_user }}"
 INTERFACES="{{ dhcpd_interface }}"
 
 exec dhcpd \
@@ -13,6 +12,6 @@ exec dhcpd \
      -cf "$DHCPD_CONF" \
      -lf "$DHCPD_LEASE" \
      -pf "$DHCPD_PID" \
-     -user "{{ dhcpd_user }}" \
+     -user "$DHCPD_USER" \
      $INTERFACES \
      2>&1
