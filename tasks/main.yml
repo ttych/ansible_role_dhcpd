@@ -9,6 +9,6 @@
 
   when: want_dhcpd
 
-- name: set has_dhcpd
+- name: "set has_dhcpd to {{ want_dhcpd }}"
   set_fact:
     has_dhcpd: "{{ want_dhcpd }}"

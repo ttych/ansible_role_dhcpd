@@ -48,14 +48,7 @@
   when: has_daemontools
 
 
-- name: deploy dhcpd.conf
-  template:
-    src: dhcpd.conf
-    dest: "{{ dhcpd_conf_file }}"
-    owner: root
-    group: "{{ root_group }}"
-    mode: '0640'
-  register: t_dhcpd_conf
+- include_tasks: dhcpd_conf.yml
 
 
 - name: setup FreeBSD newsyslog

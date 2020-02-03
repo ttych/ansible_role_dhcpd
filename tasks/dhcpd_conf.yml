@@ -1,0 +1,16 @@
+---
+
+- stat:
+    path: "{{ dhcpd_conf_file }}"
+  register: stat_dhcpd_conf_file
+
+- name: deploy dhcpd.conf
+  template:
+    src: dhcpd.conf
+    dest: "{{ dhcpd_conf_file }}"
+    owner: root
+    group: "{{ root_group }}"
+    mode: '0640'
+  register: t_dhcpd_conf
+  when: not stat_dhcpd_conf_file.stat.exists
+
