@@ -1,0 +1,22 @@
+---
+
+- name: "clone dhcpkit repo to {{ dhcpkit_dir }}"
+  git:
+    repo: "{{ dhcpkit_repo }}"
+    dest: "{{ dhcpkit_dir }}"
+    version: master
+    accept_hostkey: yes
+    umask: "022"
+    force: yes
+  register: t_dhcpkit_checkout
+
+- stat:
+    path: "{{ dhcpd_conf_file }}"
+  register: t_stat_dhcpd_conf_file
+
+- name: "dhcpkit init in {{ dhcpd_conf_dir }}"
+  command: "{{ dhcpkit_dir }}/bin/dhcpkit init"
+  args:
+    chdir: "{{ dhcpd_conf_dir }}"
+  changed_when: false
+  when: t_stat_dhcpd_conf_file.stat.exists == false

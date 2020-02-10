@@ -48,7 +48,11 @@
   when: has_daemontools
 
 
+- include_tasks: dhcpkit.yml
+  when: want_dhcpkit
+
 - include_tasks: dhcpd_conf.yml
+  when: not want_dhcpkit
 
 
 - name: setup FreeBSD newsyslog

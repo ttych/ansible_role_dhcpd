@@ -37,3 +37,8 @@ dhcpd_services_sysrcs:
 # dhcrelay_ifaces=""                    # v4 ethernet interface(s)
 # dhcrelay6_lowers=""                   # v6 "lower" network interface(s)
 # dhcrelay6_uppers=""                   # v6 "upper" network interface(s)
+
+dhcpd_dir: "/usr/local/etc"
+dhcpd_etc_dir: "{{ dhcpd_dir }}"
+dhcpd_conf_dir: "{{ dhcpd_dir }}"
+dhcpd_conf_file: "{{ dhcpd_etc_dir }}/dhcpd.conf"

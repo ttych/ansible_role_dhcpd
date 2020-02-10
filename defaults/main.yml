@@ -20,6 +20,7 @@ dhcpd_services:
 dhcpd_user: dhcpd
 
 dhcpd_dir: /etc/dhcp
+dhcpd_conf_dir: "{{ dhcpd_dir }}"
 dhcpd_conf_file: "{{ dhcpd_dir }}/dhcpd.conf"
 dhcpd_lease_file: "/var/db/lease.db"
 dhcpd_pid_file: "/var/run/dhcpd.pid"
@@ -30,3 +31,7 @@ daemontools_dir: "{{ services_dir }}/svscan"
 daemontools_svscan_dir: "{{ daemontools_dir }}/supervised"
 
 root_group: root
+
+want_dhcpkit: true
+dhcpkit_repo: https://gitlab.com/ttych/dhcpkit.git
+dhcpkit_dir: /usr/local/dhcpkit
