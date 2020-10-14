@@ -1,6 +1,6 @@
 ---
 
-dhcpd_service_dir: "{{ services_dir }}/dhcpd"
+dhcpd_service_dir: "{{ service_dir }}/dhcpd"
 dhcpd_etc_dir: "{{ dhcpd_service_dir }}/etc"
 dhcpd_conf_dir: "{{ dhcpd_etc_dir }}"
 dhcpd_conf_file: "{{ dhcpd_etc_dir }}/dhcpd.conf"
@@ -24,6 +24,6 @@ dhcpd_directories:
   - { path: "{{ dhcpd_svscan_log_dir }}", owner: root, group: "{{ root_group }}", mode: "0755" }
   - { path: "{{ dhcpd_svscan_log_dir }}/main", owner: "{{ dhcpd_user }}", group: "{{ root_group }}", mode: "0755" }
 
-newsyslog_conf_dir: "{{ services_newsyslog_dir }}"
+newsyslog_conf_dir: "{{ service_newsyslog_dir }}"
 
 dhcpkit_dir: "{{ dhcpd_service_dir }}/dhcpkit"

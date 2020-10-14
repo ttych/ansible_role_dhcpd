@@ -26,8 +26,8 @@ dhcpd_lease_file: "/var/db/lease.db"
 dhcpd_pid_file: "/var/run/dhcpd.pid"
 
 has_daemontools: false
-services_dir: /services
-daemontools_dir: "{{ services_dir }}/svscan"
+service_dir: /service
+daemontools_dir: "{{ service_dir }}/svscan"
 daemontools_svscan_dir: "{{ daemontools_dir }}/supervised"
 
 root_group: root
