@@ -1,12 +1,22 @@
 ---
-- name: inherit interfaces
-  set_fact:
-    dhcpd_interface: "{{ lan_if }}"
-  when: lan_if is defined
 
-- name: use default interface
-  set_fact:
-    dhcpd_interface: "{{ ansible_default_ipv4.interface }}"
+- name: set dhcpd_interface
+  block:
+    - name: inherit interfaces fron lan_if
+      set_fact:
+        dhcpd_interface: "{{ lan_if }}"
+      when: dhcpd_interface is not defined and lan_if is defined
+
+    - name: use default interface in non router mode
+      set_fact:
+        dhcpd_interface: "{{ ansible_default_ipv4.interface }}"
+      when: dhcpd_interface is not defined and not (is_router|d(no))
+
+    - name: use non default interface in router mode
+      set_fact:
+        dhcpd_interface: "{{ ansible_interfaces | difference([ansible_default_ipv4.interface, 'lo0', 'pflog0']) | first }}"
+      when: dhcpd_interface is not defined and (is_router|d(no))
+
   when: dhcpd_interface is not defined
 
 
